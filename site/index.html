@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#080b0d" />
+    <meta name="description" content="A local CI gate that estimates OpenTelemetry ingest, storage, egress, and cardinality before merge." />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="/night-market-telemetry.webp" as="image" type="image/webp" />
+    <title>Telemetry Budget Guard — Catch costly OTEL changes before merge</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <div class="offline" id="offline" role="status" hidden>You’re offline. The demo still works locally; install links may wait.</div>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Telemetry Budget Guard home"><span class="brand-mark" aria-hidden="true">TBG</span><span>Telemetry Budget Guard</span></a>
+      <nav aria-label="Main navigation">
+        <a href="#demo">Try it</a>
+        <a href="#docs">Docs</a>
+        <a href="https://github.com/B-Divyesh/sf-telemetry-budget-guard">Source</a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span aria-hidden="true">●</span> Local CI guard · v0.1.0</p>
+          <h1 id="hero-title">Know the telemetry tab <em>before</em> it reaches prod.</h1>
+          <p class="lede">Compare a real, redacted OTLP sample through today’s Collector config and tomorrow’s. Catch cardinality, retention, and volume jumps at review time—not invoice time.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#install">Install the CLI</a>
+            <a class="button secondary" href="#demo">Run a local estimate</a>
+          </div>
+          <ul class="trust-list" aria-label="Product guarantees">
+            <li>No upload</li><li>No vendor lock-in</li><li>Body fields dropped by default</li>
+          </ul>
+        </div>
+        <figure class="market-scene">
+          <img src="/night-market-telemetry.webp" width="1280" height="853" fetchpriority="high" alt="An illustrated night market where glowing traces, metrics, and log receipts pass through a bright budget gate." />
+          <figcaption>Every signal gets a price board before export.</figcaption>
+          <div class="gate-card" aria-hidden="true">
+            <span>PROPOSED TAB</span>
+            <strong>+30.9%</strong>
+            <small>SHUTTER: CLOSED</small>
+          </div>
+        </figure>
+      </section>
+
+      <section class="ticker" aria-label="What the guard estimates">
+        <span>INGEST / MONTH</span><b>↗</b><span>RETAINED STORAGE</span><b>↗</b><span>EGRESS</span><b>↗</b><span>ACTIVE SERIES</span>
+      </section>
+
+      <section class="workflow" id="docs" aria-labelledby="workflow-title">
+        <div class="section-heading">
+          <p class="eyebrow">One diff. Four totals.</p>
+          <h2 id="workflow-title">A budget gate built for the Collector you already run.</h2>
+        </div>
+        <ol class="steps">
+          <li><span>01</span><h3>Capture a minute</h3><p>Use bounded OTLP/HTTP JSON or compact JSONL. The sample stays on your machine.</p></li>
+          <li><span>02</span><h3>Compare pipelines</h3><p>Run the same records through baseline and proposed processor chains.</p></li>
+          <li><span>03</span><h3>Gate the change</h3><p>Declare limits in TOML. Get readable output or stable JSON and exit code 2 on failure.</p></li>
+        </ol>
+      </section>
+
+      <section class="demo" id="demo" aria-labelledby="demo-title">
+        <div class="section-heading demo-heading">
+          <div><p class="eyebrow">Local estimate counter</p><h2 id="demo-title">Try the shape of the gate.</h2></div>
+          <p>This browser demo uses compact JSONL and the sample policy shown below. Nothing leaves this page. The CLI handles full OTLP envelopes and Collector YAML.</p>
+        </div>
+
+        <div class="demo-grid">
+          <form class="tally" id="estimate-form" novalidate>
+            <div class="field-heading"><span>INPUT TICKET</span><small>JSONL · local only</small></div>
+            <label for="sample">Redacted telemetry sample</label>
+            <textarea id="sample" name="sample" rows="11" spellcheck="false" aria-describedby="sample-help sample-error"></textarea>
+            <p class="field-help" id="sample-help">One compact span, log, or metric object per line.</p>
+            <p class="field-error" id="sample-error" role="alert" hidden></p>
+            <div class="form-row">
+              <div><label for="window">Sample window</label><div class="input-unit"><input id="window" name="window" type="number" min="1" max="86400" value="60" required /><span>sec</span></div></div>
+              <div><label for="replicas">Replicas</label><input id="replicas" name="replicas" type="number" min="1" max="1000" value="2" required /></div>
+              <div><label for="limit">Delta limit</label><div class="input-unit"><input id="limit" name="limit" type="number" min="0" max="10000" value="20" required /><span>%</span></div></div>
+            </div>
+            <button class="button primary estimate-button" type="submit">Estimate proposed tab</button>
+            <button class="text-button" type="button" id="reset-demo">Restore sample</button>
+          </form>
+
+          <div class="result-board" id="result-board" aria-live="polite" aria-atomic="true">
+            <div class="board-top"><span>PRE-MERGE CHECK</span><strong id="status-badge" class="fail">FAIL</strong></div>
+            <p class="board-note" id="result-note">Proposed ingest exceeds the 20% change budget.</p>
+            <table>
+              <caption class="visually-hidden">Estimated baseline and proposed telemetry totals</caption>
+              <thead><tr><th scope="col">Meter</th><th scope="col">Before</th><th scope="col">After</th><th scope="col">Δ</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">Ingest / mo</th><td id="before-ingest">—</td><td id="after-ingest">—</td><td id="delta-ingest">—</td></tr>
+                <tr><th scope="row">Storage</th><td id="before-storage">—</td><td id="after-storage">—</td><td id="delta-storage">—</td></tr>
+                <tr><th scope="row">Series</th><td id="before-series">—</td><td id="after-series">—</td><td id="delta-series">—</td></tr>
+              </tbody>
+            </table>
+            <div class="privacy-stamp"><span aria-hidden="true">✓</span><div><strong id="redacted-count">3 sensitive fields dropped</strong><small>Aggregated in this tab. Never uploaded or stored.</small></div></div>
+            <p class="heuristic">HEURISTIC ESTIMATE · calibrate against 3 releases</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="install" id="install" aria-labelledby="install-title">
+        <div><p class="eyebrow">Set up the stall</p><h2 id="install-title">One binary. One budget file. No account.</h2><p>Build with stable Rust today. Release archives are produced by the factory after merge.</p></div>
+        <div class="command-block">
+          <div><span>TERMINAL</span><button type="button" id="copy-command">Copy command</button></div>
+          <pre><code id="install-command">cargo install --git https://github.com/B-Divyesh/sf-telemetry-budget-guard</code></pre>
+          <p id="copy-status" role="status" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <section class="details" aria-labelledby="details-title">
+        <div><p class="eyebrow">Honest by design</p><h2 id="details-title">An estimate you can inspect.</h2></div>
+        <dl>
+          <div><dt>Modeled</dt><dd>Attribute/resource actions, strict and regexp filters, probabilistic sampling, duplicated pipelines.</dd></div>
+          <div><dt>Made visible</dt><dd>Unsupported processors are warnings, never quietly treated as proof of accuracy.</dd></div>
+          <div><dt>Protected</dt><dd>Body, prompt, content, message, and query fields are removed before aggregation by default.</dd></div>
+        </dl>
+      </section>
+    </main>
+
+    <footer>
+      <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">TBG</span><span>Telemetry Budget Guard</span></a>
+      <p>Free, MIT-licensed, and vendor-neutral.</p>
+      <nav aria-label="Legal"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-telemetry-budget-guard">GitHub</a></nav>
+    </footer>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

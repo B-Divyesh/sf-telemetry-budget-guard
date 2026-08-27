@@ -1,0 +1,18 @@
+{
+  "name": "telemetry-budget-guard",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --config site/vite.config.ts",
+    "test": "cargo test --locked && npm run test:site",
+    "test:site": "node --test site/tests/*.test.mjs",
+    "build": "npm run build:site && cargo build --release --locked && node scripts/stage-binary.mjs",
+    "build:site": "vite build --config site/vite.config.ts",
+    "package:cli": "cargo package --manifest-path crates/telemetry-budget-guard/Cargo.toml --locked"
+  },
+  "devDependencies": {
+    "typescript": "5.9.2",
+    "vite": "7.3.6"
+  }
+}

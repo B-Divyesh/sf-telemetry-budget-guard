@@ -1,0 +1,7 @@
+@import './style.css';
+.legal-main { max-width: 760px; min-height: 70vh; margin: auto; padding: 80px 32px; }
+.legal-main h1 { font-size: clamp(2.5rem, 7vw, 4.5rem); }
+.legal-main h2 { margin-top: 48px; font-size: 1.6rem; }
+.legal-main p, .legal-main li { color: var(--muted); }
+.legal-main a { color: var(--cyan); }
+@media (max-width: 520px) { .legal-main { padding: 56px 20px; } }
