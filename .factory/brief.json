@@ -1,0 +1,16 @@
+{
+  "slug": "telemetry-budget-guard",
+  "title": "Telemetry Budget Guard",
+  "territory": "devtools-data",
+  "user": "Engineers adding OpenTelemetry to a small service who need to prevent cardinality, retention, and log-volume changes from silently creating an unaffordable observability bill.",
+  "smallest_useful_product": "A CLI that consumes a bounded redacted OTLP sample and collector config, estimates cardinality/storage/egress deltas for rule changes, and fails a declared budget in CI.",
+  "success_measure": "Teams keep measured telemetry ingest within 20% of the pre-merge estimate for three successive releases.",
+  "artifact_class": "cli",
+  "monetization": "free",
+  "constraints": [
+    "Drop body/prompt fields by default",
+    "Only aggregate samples",
+    "Label estimates as heuristic",
+    "Support OTLP semantic-convention changes"
+  ]
+}
