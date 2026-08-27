@@ -491,7 +491,7 @@ fn parse_resource_metrics(
                             signal: Signal::Metric,
                             name: name.clone(),
                             attributes,
-                            timestamp: point.as_object().and_then(|m| parse_timestamp(m)),
+                            timestamp: point.as_object().and_then(parse_timestamp),
                             sample_factor: 1.0,
                         });
                     }
@@ -753,15 +753,15 @@ fn filter_keeps(
         ));
         return true;
     }
-    if let Some(include) = yaml_get(section, "include") {
-        if !matches_rule(record, include) {
-            return false;
-        }
+    if let Some(include) = yaml_get(section, "include")
+        && !matches_rule(record, include)
+    {
+        return false;
     }
-    if let Some(exclude) = yaml_get(section, "exclude") {
-        if matches_rule(record, exclude) {
-            return false;
-        }
+    if let Some(exclude) = yaml_get(section, "exclude")
+        && matches_rule(record, exclude)
+    {
+        return false;
     }
     true
 }
@@ -1008,16 +1008,16 @@ fn absolute_violation(
     limit: Option<f64>,
     unit: &str,
 ) {
-    if let Some(limit) = limit {
-        if actual > limit {
-            result.push(Violation {
-                metric: metric.into(),
-                actual,
-                limit,
-                unit: unit.into(),
-                message: format!("{metric} is {actual:.4} {unit} (limit {limit:.4} {unit})"),
-            });
-        }
+    if let Some(limit) = limit
+        && actual > limit
+    {
+        result.push(Violation {
+            metric: metric.into(),
+            actual,
+            limit,
+            unit: unit.into(),
+            message: format!("{metric} is {actual:.4} {unit} (limit {limit:.4} {unit})"),
+        });
     }
 }
 
