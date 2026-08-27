@@ -1,0 +1,56 @@
+{
+  "resourceSpans": [{
+    "resource": {"attributes": [
+      {"key": "service.name", "value": {"stringValue": "checkout"}},
+      {"key": "deployment.environment.name", "value": {"stringValue": "staging"}}
+    ]},
+    "scopeSpans": [{"spans": [
+      {"name": "POST /checkout", "startTimeUnixNano": "1760000000000000000", "attributes": [
+        {"key": "http.request.method", "value": {"stringValue": "POST"}},
+        {"key": "http.route", "value": {"stringValue": "/checkout"}},
+        {"key": "customer.id", "value": {"stringValue": "c-101"}}
+      ]},
+      {"name": "GET /health", "startTimeUnixNano": "1760000001000000000", "attributes": [
+        {"key": "http.request.method", "value": {"stringValue": "GET"}},
+        {"key": "http.route", "value": {"stringValue": "/health"}}
+      ]}
+    ]}]
+  }],
+  "resourceLogs": [{
+    "resource": {"attributes": [{"key": "service.name", "value": {"stringValue": "checkout"}}]},
+    "scopeLogs": [{"logRecords": [
+      {"severityText": "INFO", "timeUnixNano": "1760000002000000000", "body": {"stringValue": "checkout completed for c-101"}, "attributes": [
+        {"key": "event.name", "value": {"stringValue": "checkout.completed"}},
+        {"key": "gen_ai.prompt", "value": {"stringValue": "sensitive example"}},
+        {"key": "customer.id", "value": {"stringValue": "c-101"}}
+      ]},
+      {"severityText": "DEBUG", "timeUnixNano": "1760000003000000000", "body": {"stringValue": "cache key details"}, "attributes": [
+        {"key": "event.name", "value": {"stringValue": "cache.hit"}},
+        {"key": "customer.id", "value": {"stringValue": "c-202"}}
+      ]}
+    ]}]
+  }],
+  "resourceMetrics": [{
+    "resource": {"attributes": [{"key": "service.name", "value": {"stringValue": "checkout"}}]},
+    "scopeMetrics": [{"metrics": [{
+      "name": "http.server.request.duration",
+      "histogram": {"dataPoints": [
+        {"timeUnixNano": "1760000004000000000", "attributes": [
+          {"key": "http.request.method", "value": {"stringValue": "POST"}},
+          {"key": "http.route", "value": {"stringValue": "/checkout"}},
+          {"key": "customer.id", "value": {"stringValue": "c-101"}}
+        ]},
+        {"timeUnixNano": "1760000005000000000", "attributes": [
+          {"key": "http.request.method", "value": {"stringValue": "POST"}},
+          {"key": "http.route", "value": {"stringValue": "/checkout"}},
+          {"key": "customer.id", "value": {"stringValue": "c-202"}}
+        ]},
+        {"timeUnixNano": "1760000006000000000", "attributes": [
+          {"key": "http.request.method", "value": {"stringValue": "GET"}},
+          {"key": "http.route", "value": {"stringValue": "/health"}},
+          {"key": "customer.id", "value": {"stringValue": "c-303"}}
+        ]}
+      ]}
+    }]}]
+  }]
+}
