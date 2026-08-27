@@ -1,5 +1,11 @@
 # Telemetry Budget Guard — build handoff
 
+## Independent verification update — FAIL (2026-08-27 UTC)
+
+Candidate `45576051ce989d3204ba1711114a3772cbfa6d4b` passed clean local install, strict Rust formatting/linting, all 9 repository tests, exact production build, Cargo package verification, clean-consumer install, CLI boundary/invalid/privacy exercises, production-build browser checks, axe (0 serious/critical), offline reload, and Lighthouse mobile (100 Performance / 100 Accessibility).
+
+**Release status is FAIL:** `https://telemetry-budget-guard.sociobot.in` does not serve the candidate. Normal HTTPS fails hostname certificate verification; the presented certificate is for `*.msha-slice-7-eus2-1-ase.p.azurewebsites.net`, not the product hostname. A deliberately insecure diagnostic request returns Azure's `404 Site Not Found` page. This prevents live identity, header, caching, and deployment-match acceptance. Correct the host binding/DNS/TLS and deploy `dist/site`, then rerun live verification. Full evidence is in [`.factory/verification.md`](verification.md).
+
 ## What shipped
 
 - Rust 0.1.0 single-binary CLI with helpful `--help`, human output, stable `--json`, and CI exit codes (`0` pass, `1` invalid input, `2` budget failure).
