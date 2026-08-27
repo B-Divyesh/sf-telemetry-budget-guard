@@ -1,5 +1,5 @@
 const CACHE = 'telemetry-budget-guard-v1'
-const SHELL = ['/', '/privacy/', '/terms/', '/favicon.svg', '/night-market-telemetry.webp']
+const SHELL = ['/', '/privacy/', '/terms/', '/favicon.svg', '/night-market-telemetry.webp', '/night-market-telemetry-720.webp']
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)))

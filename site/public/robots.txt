@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://telemetry-budget-guard.sociobot.in/sitemap.xml

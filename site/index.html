@@ -36,7 +36,7 @@
           </ul>
         </div>
         <figure class="market-scene">
-          <img src="/night-market-telemetry.webp" width="1280" height="853" fetchpriority="high" alt="An illustrated night market where glowing traces, metrics, and log receipts pass through a bright budget gate." />
+          <img src="/night-market-telemetry.webp" srcset="/night-market-telemetry-720.webp 720w, /night-market-telemetry.webp 1280w" sizes="(max-width: 850px) calc(100vw - 40px), 54vw" width="1280" height="853" fetchpriority="high" alt="An illustrated night market where glowing traces, metrics, and log receipts pass through a bright budget gate." />
           <figcaption>Every signal gets a price board before export.</figcaption>
           <div class="gate-card" aria-hidden="true">
             <span>PROPOSED TAB</span>
@@ -106,7 +106,7 @@
         <div><p class="eyebrow">Set up the stall</p><h2 id="install-title">One binary. One budget file. No account.</h2><p>Build with stable Rust today. Release archives are produced by the factory after merge.</p></div>
         <div class="command-block">
           <div><span>TERMINAL</span><button type="button" id="copy-command">Copy command</button></div>
-          <pre><code id="install-command">cargo install --git https://github.com/B-Divyesh/sf-telemetry-budget-guard</code></pre>
+          <pre tabindex="0" aria-label="cargo install --git https://github.com/B-Divyesh/sf-telemetry-budget-guard"><code id="install-command">cargo install --git https://github.com/B-Divyesh/sf-telemetry-budget-guard</code></pre>
           <p id="copy-status" role="status" aria-live="polite"></p>
         </div>
       </section>
