@@ -6,7 +6,7 @@ This repair addresses both release blockers in [`.factory/verification-2.md`](ve
 
 - Added `site/public/staticwebapp.config.json`, the Azure Static Web Apps-native response-policy configuration. It applies the required self-only CSP, `Permissions-Policy: camera=(), microphone=(), geolocation=()`, `Referrer-Policy: no-referrer`, and `X-Content-Type-Options: nosniff`; it applies `Cache-Control: public, max-age=31536000, immutable` to `/assets/*`, both WebP images, and the favicon. The compatible `_headers` file remains in place.
 - Added `tabindex="-1"` to the landing, privacy, and terms main landmarks. Native skip-link fragment navigation now transfers focus to `main`.
-- Added exact response-policy contract coverage, a Chromium skip-link regression test, desktop and 390px Chromium/axe smoke tests, and strict TypeScript checking. The live production host must now deploy the checked-in Azure-native configuration.
+- Added exact response-policy contract coverage, a Chromium skip-link regression test, desktop and 390px Chromium/axe smoke tests, and strict TypeScript checking. The factory deployed the checked-in Azure-native configuration to the existing static product host.
 
 ## What shipped
 
@@ -45,10 +45,18 @@ Final local verification on 2026-08-28:
 - `cargo package --manifest-path crates/telemetry-budget-guard/Cargo.toml --locked`: packaged and verified successfully (16 KB crate archive).
 - `cargo fmt --check` and `cargo clippy --workspace --all-targets --locked -- -D warnings`: passed.
 - Clean consumer: installed the packaged crate to a fresh temporary Cargo root and ran its binary against shipped fixtures; it returned a valid passing JSON report with `heuristic: true` and `sample_persisted: false`.
-- Production preview PWA: after registration and controlled reload, `navigator.serviceWorker.controller` was true; an offline reload returned 200 and retained the title.
+- Production preview and live PWA: after registration and controlled reload, `navigator.serviceWorker.controller` was true; an offline reload returned 200 and retained the title.
 - Initial payload: 4.46 KB JS, 10.91 KB CSS, 43 KB mobile hero; no third-party runtime requests or fonts.
 
-After static deployment, live response verification must confirm the headers above on `/` and `/assets/main-BpOzwUEz.js`; the asset must have the immutable one-year cache value. The live keyboard flow must put focus on `main` after activating the skip link.
+## Live deployment evidence
+
+The factory static deployment completed successfully on 2026-08-28 (Azure deployment `5483d8a3-45de-4fc2-9e4e-cfa23419fe65`) and the managed TLS endpoint returned HTTPS 200.
+
+- `curl -I https://telemetry-budget-guard.sociobot.in/` returned the self-only CSP, `Permissions-Policy: camera=(), microphone=(), geolocation=()`, `Referrer-Policy: no-referrer`, and `X-Content-Type-Options: nosniff`.
+- `curl -I https://telemetry-budget-guard.sociobot.in/assets/main-BpOzwUEz.js` returned those same security headers plus `Cache-Control: public, max-age=31536000, immutable`.
+- SHA-256 identity checks matched the production build for the root, privacy and terms pages; both JavaScript assets; both CSS assets; both WebP assets; the service worker; and favicon.
+- Live Playwright desktop and 390px mobile checks passed: skip-link Enter focused `main`, axe had 0 serious/critical findings, cookies/local/session storage were empty, console/page errors were empty, and all initial requests were same-origin.
+- Live Lighthouse 12.8.2 mobile report: Performance 100, Accessibility 100, Best Practices 100, SEO 100; FCP 1.1 s, LCP 1.1 s, CLS 0, TBT 0 ms. Lighthouse emitted its known final tab-crash warning after writing the complete JSON report.
 
 ## Known gaps and next steps
 
