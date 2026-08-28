@@ -1,10 +1,12 @@
-# Telemetry Budget Guard — build handoff
+# Telemetry Budget Guard — repair handoff
 
-## Independent verification update — FAIL (2026-08-28 UTC)
+## Release repair (2026-08-28 UTC)
 
-Candidate `45576051ce989d3204ba1711114a3772cbfa6d4b` passed clean installation, all repository tests, exact production build, strict Rust formatting/linting, Cargo package verification, clean-consumer installation, representative CLI pass/fail/boundary/invalid/privacy checks, live browser flows, axe (0 serious/critical), offline reload, and live Lighthouse (100 Performance / 100 Accessibility).
+This repair addresses both release blockers in [`.factory/verification-2.md`](verification-2.md) while preserving the CLI, privacy model, static deployment class, and all previously passing behavior.
 
-**Release status is FAIL.** The prior hostname/404 failure is fixed: the live HTTPS site is 200 and checked HTML, JS, CSS, images, service worker, legal pages, and favicon exactly match the candidate build. It still fails acceptance because the host does not apply the candidate's `_headers`: no CSP or Permissions-Policy, non-matching Referrer-Policy, and 30-second rather than immutable asset caching. Additionally, the keyboard skip link changes the URL fragment but leaves focus on itself instead of moving it into `<main>`. Full current evidence and exact repro are in [`.factory/verification-2.md`](verification-2.md); the prior outage report is retained in [`.factory/verification.md`](verification.md).
+- Added `site/public/staticwebapp.config.json`, the Azure Static Web Apps-native response-policy configuration. It applies the required self-only CSP, `Permissions-Policy: camera=(), microphone=(), geolocation=()`, `Referrer-Policy: no-referrer`, and `X-Content-Type-Options: nosniff`; it applies `Cache-Control: public, max-age=31536000, immutable` to `/assets/*`, both WebP images, and the favicon. The compatible `_headers` file remains in place.
+- Added `tabindex="-1"` to the landing, privacy, and terms main landmarks. Native skip-link fragment navigation now transfers focus to `main`.
+- Added exact response-policy contract coverage, a Chromium skip-link regression test, desktop and 390px Chromium/axe smoke tests, and strict TypeScript checking. The live production host must now deploy the checked-in Azure-native configuration.
 
 ## What shipped
 
@@ -34,16 +36,19 @@ target/release/telemetry-budget-guard check \
 
 The example deliberately exceeds `max_delta_percent` and exits 2.
 
-Final local verification on 2026-08-27:
+Final local verification on 2026-08-28:
 
-- `npm test`: 6 Rust tests + 3 site contract tests passed.
-- `npm run build`: passed; `dist/site/index.html` exists and the release binary is staged under `dist/site/download/`.
+- Clean `npm ci`: passed; `npm audit` reported 0 vulnerabilities.
+- `npm test`: passed — 4 Rust unit tests, 2 Rust CLI integration tests, strict TypeScript checking, 4 static-site policy/privacy/semantic tests, a Chromium skip-link regression test, and desktop plus 390px Chromium/axe smoke tests.
+- Browser smoke: default estimator state loaded; a 10,000% limit recovered to `PASS`; Enter from the skip link focused `main`; axe reported 0 serious/critical findings; there were 0 console errors, 0 page errors, and all page requests were self-origin.
+- `npm run build`: passed; `dist/site/index.html`, `dist/site/staticwebapp.config.json`, and the release binary staged under `dist/site/download/` exist. The generated Azure configuration byte-matches its checked-in source.
 - `cargo package --manifest-path crates/telemetry-budget-guard/Cargo.toml --locked`: packaged and verified successfully (16 KB crate archive).
-- Factory `verify-url.sh`: HTTP 200, 0 console/page errors, title/lang/main present, exactly one h1, 0 images missing alt, 0 unlabeled buttons.
-- axe-core 4.10.3 in headless Chrome: 0 violations.
-- Lighthouse 12.8.2, mobile preset: Performance 100, Accessibility 100, Best Practices 100, SEO 100; FCP 0.9 s, LCP 1.5 s, CLS 0, TBT 0 ms.
+- `cargo fmt --check` and `cargo clippy --workspace --all-targets --locked -- -D warnings`: passed.
+- Clean consumer: installed the packaged crate to a fresh temporary Cargo root and ran its binary against shipped fixtures; it returned a valid passing JSON report with `heuristic: true` and `sample_persisted: false`.
+- Production preview PWA: after registration and controlled reload, `navigator.serviceWorker.controller` was true; an offline reload returned 200 and retained the title.
 - Initial payload: 4.46 KB JS, 10.91 KB CSS, 43 KB mobile hero; no third-party runtime requests or fonts.
-- `npm audit`: 0 vulnerabilities.
+
+After static deployment, live response verification must confirm the headers above on `/` and `/assets/main-BpOzwUEz.js`; the asset must have the immutable one-year cache value. The live keyboard flow must put focus on `main` after activating the skip link.
 
 ## Known gaps and next steps
 

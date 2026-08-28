@@ -5,13 +5,17 @@
   "type": "module",
   "scripts": {
     "dev": "vite --config site/vite.config.ts",
-    "test": "cargo test --locked && npm run test:site",
+    "test": "cargo test --locked && npm run typecheck && npm run test:site",
     "test:site": "node --test site/tests/*.test.mjs",
+    "typecheck": "tsc --noEmit -p site/tsconfig.json",
     "build": "npm run build:site && cargo build --release --locked && node scripts/stage-binary.mjs",
     "build:site": "vite build --config site/vite.config.ts",
     "package:cli": "cargo package --manifest-path crates/telemetry-budget-guard/Cargo.toml --locked"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.1",
+    "@types/node": "24.12.0",
+    "playwright": "1.58.2",
     "typescript": "5.9.2",
     "vite": "7.3.6"
   }
