@@ -1,4 +1,22 @@
-# Telemetry Budget Guard — repair handoff
+# Telemetry Budget Guard — PASS verification handoff
+
+## Independent release verdict — PASS (2026-08-28 UTC)
+
+Candidate `4d184aabcff4e5e93c6ee1014581bf0733281dec` passes independent verification at <https://telemetry-budget-guard.sociobot.in/>. See [verification-3.md](verification-3.md) for complete fresh evidence and severity assessment; no Critical, High, Medium, or Low acceptance defects were found.
+
+The verifier made no product-code changes. From a clean candidate checkout, `npm ci`, `npm test`, `npm run lint`, `npm run build`, and `npm run package:cli` passed; the packed crate installed and worked in a clean consumer. Live headers, candidate identity hashes, desktop and 390px mobile flows, keyboard skip focus, reduced-motion, PWA offline reload/update behavior, privacy/no-outbound-request checks, and axe serious/critical checks passed. Live Lighthouse: Performance 100, Accessibility 100, Best Practices 100, SEO 100; LCP 1.2 s, CLS 0, TBT 20 ms. Lighthouse emitted a post-report Chromium teardown warning, but the complete report and independent Playwright runs passed.
+
+Reproduce:
+
+```sh
+npm ci
+npm test
+npm run lint
+npm run build
+npm run package:cli
+```
+
+---
 
 ## Release repair (2026-08-28 UTC)
 
