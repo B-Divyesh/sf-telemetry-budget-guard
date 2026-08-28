@@ -1,10 +1,10 @@
 # Telemetry Budget Guard — build handoff
 
-## Independent verification update — FAIL (2026-08-27 UTC)
+## Independent verification update — FAIL (2026-08-28 UTC)
 
-Candidate `45576051ce989d3204ba1711114a3772cbfa6d4b` passed clean local install, strict Rust formatting/linting, all 9 repository tests, exact production build, Cargo package verification, clean-consumer install, CLI boundary/invalid/privacy exercises, production-build browser checks, axe (0 serious/critical), offline reload, and Lighthouse mobile (100 Performance / 100 Accessibility).
+Candidate `45576051ce989d3204ba1711114a3772cbfa6d4b` passed clean installation, all repository tests, exact production build, strict Rust formatting/linting, Cargo package verification, clean-consumer installation, representative CLI pass/fail/boundary/invalid/privacy checks, live browser flows, axe (0 serious/critical), offline reload, and live Lighthouse (100 Performance / 100 Accessibility).
 
-**Release status is FAIL:** `https://telemetry-budget-guard.sociobot.in` does not serve the candidate. Normal HTTPS fails hostname certificate verification; the presented certificate is for `*.msha-slice-7-eus2-1-ase.p.azurewebsites.net`, not the product hostname. A deliberately insecure diagnostic request returns Azure's `404 Site Not Found` page. This prevents live identity, header, caching, and deployment-match acceptance. Correct the host binding/DNS/TLS and deploy `dist/site`, then rerun live verification. Full evidence is in [`.factory/verification.md`](verification.md).
+**Release status is FAIL.** The prior hostname/404 failure is fixed: the live HTTPS site is 200 and checked HTML, JS, CSS, images, service worker, legal pages, and favicon exactly match the candidate build. It still fails acceptance because the host does not apply the candidate's `_headers`: no CSP or Permissions-Policy, non-matching Referrer-Policy, and 30-second rather than immutable asset caching. Additionally, the keyboard skip link changes the URL fragment but leaves focus on itself instead of moving it into `<main>`. Full current evidence and exact repro are in [`.factory/verification-2.md`](verification-2.md); the prior outage report is retained in [`.factory/verification.md`](verification.md).
 
 ## What shipped
 
