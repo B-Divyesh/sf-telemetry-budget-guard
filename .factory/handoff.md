@@ -40,6 +40,7 @@ Final local verification on 2026-08-28:
 
 - Clean `npm ci`: passed; `npm audit` reported 0 vulnerabilities.
 - `npm test`: passed — 4 Rust unit tests, 2 Rust CLI integration tests, strict TypeScript checking, 4 static-site policy/privacy/semantic tests, a Chromium skip-link regression test, and desktop plus 390px Chromium/axe smoke tests.
+- `npm run lint`: passed — strict TypeScript, Rust formatting, and Clippy with warnings denied.
 - Browser smoke: default estimator state loaded; a 10,000% limit recovered to `PASS`; Enter from the skip link focused `main`; axe reported 0 serious/critical findings; there were 0 console errors, 0 page errors, and all page requests were self-origin.
 - `npm run build`: passed; `dist/site/index.html`, `dist/site/staticwebapp.config.json`, and the release binary staged under `dist/site/download/` exist. The generated Azure configuration byte-matches its checked-in source.
 - `cargo package --manifest-path crates/telemetry-budget-guard/Cargo.toml --locked`: packaged and verified successfully (16 KB crate archive).

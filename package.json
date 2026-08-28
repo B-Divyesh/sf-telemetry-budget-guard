@@ -8,6 +8,7 @@
     "test": "cargo test --locked && npm run typecheck && npm run test:site",
     "test:site": "node --test site/tests/*.test.mjs",
     "typecheck": "tsc --noEmit -p site/tsconfig.json",
+    "lint": "npm run typecheck && cargo fmt --check && cargo clippy --workspace --all-targets --locked -- -D warnings",
     "build": "npm run build:site && cargo build --release --locked && node scripts/stage-binary.mjs",
     "build:site": "vite build --config site/vite.config.ts",
     "package:cli": "cargo package --manifest-path crates/telemetry-budget-guard/Cargo.toml --locked"
