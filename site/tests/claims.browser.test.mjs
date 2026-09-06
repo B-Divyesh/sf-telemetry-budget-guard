@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict'
-import { readFile } from 'node:fs/promises'
+import { mkdtemp, readFile, rm } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import test, { after, before } from 'node:test'
 import AxeBuilder from '@axe-core/playwright'
@@ -10,10 +12,12 @@ const configFile = fileURLToPath(new URL('../vite.config.ts', import.meta.url))
 let browser
 let server
 let siteUrl
+let testDist
 
 before(async () => {
-  await build({ configFile, logLevel: 'silent' })
-  server = await preview({ configFile, preview: { host: '127.0.0.1', port: 0 }, logLevel: 'silent' })
+  testDist = await mkdtemp(join(tmpdir(), 'tbg-browser-build-'))
+  await build({ configFile, build: { outDir: testDist }, logLevel: 'silent' })
+  server = await preview({ configFile, build: { outDir: testDist }, preview: { host: '127.0.0.1', port: 0 }, logLevel: 'silent' })
   siteUrl = server.resolvedUrls.local[0].replace(/\/$/, '')
   browser = await chromium.launch({ headless: true })
 })
@@ -21,6 +25,7 @@ before(async () => {
 after(async () => {
   await browser?.close()
   await server?.httpServer.close()
+  if (testDist) await rm(testDist, { recursive: true, force: true })
 })
 
 async function trackedPage(viewport = { width: 1280, height: 900 }) {
