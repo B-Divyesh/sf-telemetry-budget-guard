@@ -107,16 +107,21 @@ test('@claim:offline-reload reloads the populated sample offline after one onlin
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'allow' })
   try {
     const page = await context.newPage()
+    const errors = []
+    page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()) })
+    page.on('pageerror', (error) => errors.push(String(error)))
     await page.goto(`${siteUrl}/demo/`, { waitUntil: 'networkidle' })
+    await page.waitForFunction(() => document.querySelector('#before-ingest')?.textContent !== '—')
     await page.evaluate(() => navigator.serviceWorker.ready)
     await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller))
     await context.setOffline(true)
     const response = await page.reload({ waitUntil: 'domcontentloaded' })
     assert.equal(response?.status(), 200)
-    await page.waitForFunction(() => document.querySelector('#status-badge')?.textContent === 'FAIL')
+    await page.waitForFunction(() => document.querySelector('#before-ingest')?.textContent !== '—')
     assert.equal(await page.locator('.demo-banner strong').textContent(), 'Demo — sample data, nothing is saved')
     assert.match(await page.locator('#before-ingest').textContent(), /MiB|GiB/)
     assert.equal(await page.locator('#offline').isVisible(), true)
+    assert.deepEqual(errors, [])
   } finally {
     await context.close()
   }

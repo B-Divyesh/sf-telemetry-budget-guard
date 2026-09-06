@@ -1,4 +1,4 @@
-const CACHE = 'telemetry-budget-guard-v4'
+const CACHE = 'telemetry-budget-guard-v5'
 const SHELL = ['/', '/demo/', '/privacy/', '/terms/', '/404.html', '/favicon.svg', '/apple-touch-icon.png', '/og-image.webp', '/night-market-telemetry.webp', '/night-market-telemetry-720.webp']
 const HTML_ROUTES = ['/', '/demo/', '/privacy/', '/terms/', '/404.html']
 
@@ -32,5 +32,5 @@ self.addEventListener('fetch', (event) => {
       event.waitUntil(caches.open(CACHE).then((cache) => cache.put(event.request, copy)))
     }
     return response
-  }).catch(() => caches.match(event.request).then((cached) => cached || caches.match('/'))))
+  }).catch(() => caches.match(event.request, { ignoreVary: true }).then((cached) => cached || caches.match('/'))))
 })
