@@ -1,4 +1,24 @@
-# Telemetry Budget Guard — PASS verification handoff
+# Telemetry Budget Guard — review handoff
+
+## Review 1 verdict — FAIL (2026-09-06 UTC)
+
+Independent review of live implementation `4d184aabcff4e5e93c6ee1014581bf0733281dec` at documentation head `0698a1fe414fe2214a206a83eb2654a769580971` found **6 defects and 21 untested public claims**. See [review-1.md](review-1.md) for the complete evidence and required disposition.
+
+The core CLI, clean Git install, pass/fail/invalid/boundary/recovery paths, live privacy behavior, offline reload, response policies, reduced motion, axe scan, and performance budgets pass. Acceptance fails because `.factory/claims.json` and all `@claim` tests are absent; the required real-binary sample demo, `/demo`, persistent sample label, complete reset, and demo documentation are absent; first-screen copy does not plainly name the job and audience; required metadata and a designed 404 are missing; the installed package cannot run the documented fixture without the repository; and one legal link is below the 44 px touch-target baseline. The live release-archive claim is also contradicted by the 404 download path.
+
+No product code was changed in review 1. Reproduce the passing gates with:
+
+```sh
+npm ci
+npm test
+npm run lint
+npm run build
+npm run package:cli
+```
+
+Repair all findings, add every public claim to the claims registry with one sandboxed tagged test, deploy the new candidate, and run a fresh strict review. A successful build does not change the current product verdict.
+
+---
 
 ## Independent release verdict — PASS (2026-08-28 UTC)
 
