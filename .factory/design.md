@@ -25,7 +25,7 @@ All body combinations are ≥ 4.5:1. Status never depends on color: `PASS`, `FAI
 
 - Display and body: a system sans stack (`Inter` where installed, `ui-sans-serif`, `system-ui`) for fast, private loading and sturdy sign-letter shapes.
 - Code and numbers: `ui-monospace`, `SFMono-Regular`, `Cascadia Code`, `Liberation Mono`; tabular figures make before/after columns stable.
-- Scale: 16px body, 18px lead, 20px section intro, 28px section title, clamp(40px, 7vw, 76px) hero. Measures cap at 68 characters.
+- Scale: 16px body, 18px lead, 20px section intro, 28px section title, and a responsive 45–64px hero. Measures cap at 68 characters.
 
 No font files are shipped: this avoids a network request and keeps the static product below budget while still using two purposeful typographic voices.
 

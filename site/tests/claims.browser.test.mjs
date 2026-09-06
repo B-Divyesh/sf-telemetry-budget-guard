@@ -162,22 +162,24 @@ test('@claim:demo-sandbox opens in one click, shows populated output, resets ful
   }
 })
 
-test('first screen states the job, audience, action, and three facts before scrolling on a phone', async () => {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 } })
-  try {
-    const page = await context.newPage()
-    await page.goto(siteUrl, { waitUntil: 'networkidle' })
-    assert.equal(await page.locator('h1').textContent(), 'Check OpenTelemetry changes against your budget')
-    assert.match(await page.locator('.lede').textContent(), /engineers adding OpenTelemetry to a small service/)
-    assert.equal(await page.getByRole('link', { name: 'Try it with sample data' }).count(), 1)
-    assert.equal(await page.locator('.trust-list li').count(), 3)
-    for (const selector of ['h1', '.lede', '.hero-actions', '.trust-list']) {
-      const box = await page.locator(selector).boundingBox()
-      assert.ok(box && box.y + box.height <= 844, `${selector} is below the first screen: ${JSON.stringify(box)}`)
+test('first screen states the job, audience, action, and three facts before scrolling', async () => {
+  for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844 }]) {
+    const context = await browser.newContext({ viewport })
+    try {
+      const page = await context.newPage()
+      await page.goto(siteUrl, { waitUntil: 'networkidle' })
+      assert.equal(await page.locator('h1').textContent(), 'Check OpenTelemetry changes against your budget')
+      assert.match(await page.locator('.lede').textContent(), /engineers adding OpenTelemetry to a small service/)
+      assert.equal(await page.getByRole('link', { name: 'Try it with sample data' }).count(), 1)
+      assert.equal(await page.locator('.trust-list li').count(), 3)
+      for (const selector of ['h1', '.lede', '.hero-actions', '.trust-list']) {
+        const box = await page.locator(selector).boundingBox()
+        assert.ok(box && box.y + box.height <= viewport.height, `${selector} is below ${viewport.width}x${viewport.height}: ${JSON.stringify(box)}`)
+      }
+      assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), viewport.width)
+    } finally {
+      await context.close()
     }
-    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 390)
-  } finally {
-    await context.close()
   }
 })
 
