@@ -1,0 +1,1 @@
+Check OpenTelemetry changes against ingest, storage, egress, and cardinality budgets before merge.

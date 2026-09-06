@@ -1,0 +1,16 @@
+processors:
+  attributes/add-team:
+    actions:
+      - key: team.name
+        action: insert
+        value: payments
+  batch: {}
+
+service:
+  pipelines:
+    traces:
+      processors: [attributes/add-team, batch]
+    logs:
+      processors: [attributes/add-team, batch]
+    metrics:
+      processors: [attributes/add-team, batch]

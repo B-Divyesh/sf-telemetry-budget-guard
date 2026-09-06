@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#080b0d" />
+    <meta name="description" content="Run the bundled checkout-service telemetry sample and inspect a populated budget result without saving data." />
+    <link rel="canonical" href="https://telemetry-budget-guard.sociobot.in/demo/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Demo — Telemetry Budget Guard" />
+    <meta property="og:description" content="Run a sample OpenTelemetry budget check without saving data." />
+    <meta property="og:url" content="https://telemetry-budget-guard.sociobot.in/demo/" />
+    <meta property="og:image" content="https://telemetry-budget-guard.sociobot.in/og-image.webp" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Demo — Telemetry Budget Guard" />
+    <meta name="twitter:description" content="Run a sample OpenTelemetry budget check without saving data." />
+    <meta name="twitter:image" content="https://telemetry-budget-guard.sociobot.in/og-image.webp" />
+    <title>Demo — Telemetry Budget Guard</title>
+  </head>
+  <body data-demo-page>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <div class="offline" id="offline" role="status" hidden>You are offline. This sample still works in your browser.</div>
+    <div class="demo-banner" role="status">
+      <strong>Demo — sample data, nothing is saved</strong>
+      <span class="demo-banner-actions"><button type="button" id="reset-banner">Reset demo</button><a href="/#install">Start for real</a></span>
+    </div>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Telemetry Budget Guard home"><span class="brand-mark" aria-hidden="true">TBG</span><span>Telemetry Budget Guard</span></a>
+      <nav aria-label="Main navigation"><a href="/demo/" aria-current="page">Demo</a><a href="/#how-it-works">How it works</a><a href="/privacy/">Privacy</a></nav>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <section class="demo-intro" aria-labelledby="demo-page-title">
+        <div>
+          <p class="eyebrow">Checkout-service sample</p>
+          <h1 id="demo-page-title">Review a sample telemetry budget</h1>
+          <p class="lede">The proposed Collector config keeps more records and adds an attribute. The sample fails its 20% change limit.</p>
+        </div>
+        <div class="sample-summary" aria-label="Sample result summary"><span>EXPECTED RESULT</span><strong>FAIL</strong><small>3 sensitive fields dropped</small></div>
+      </section>
+
+      <section class="demo" aria-labelledby="browser-demo-title">
+        <div class="section-heading demo-heading">
+          <div><p class="eyebrow">Browser preview</p><h2 id="browser-demo-title">Change the sample assumptions</h2></div>
+          <p>This preview uses a compact version of the sample. Install the CLI for full OTLP and Collector YAML checks.</p>
+        </div>
+        <div class="demo-grid">
+          <form class="tally" id="estimate-form" novalidate>
+            <div class="field-heading"><span>SAMPLE INPUT</span><small>JSONL · this tab only</small></div>
+            <label for="sample">Telemetry sample</label>
+            <textarea id="sample" name="sample" rows="11" spellcheck="false" aria-describedby="sample-help sample-error"></textarea>
+            <p class="field-help" id="sample-help">One compact span, log, or metric object per line.</p>
+            <p class="field-error" id="sample-error" role="alert" hidden></p>
+            <div class="form-row">
+              <div><label for="window">Sample window</label><div class="input-unit"><input id="window" name="window" type="number" min="1" max="86400" value="60" required /><span>sec</span></div></div>
+              <div><label for="replicas">Replicas</label><input id="replicas" name="replicas" type="number" min="1" max="1000" value="2" required /></div>
+              <div><label for="limit">Delta limit</label><div class="input-unit"><input id="limit" name="limit" type="number" min="0" max="10000" value="20" required /><span>%</span></div></div>
+            </div>
+            <button class="button primary estimate-button" type="submit">Check the sample</button>
+            <button class="text-button" type="button" id="reset-demo">Reset demo</button>
+          </form>
+
+          <div class="result-board" id="result-board" aria-live="polite" aria-atomic="true">
+            <div class="board-top"><span>PROPOSED CHANGE</span><strong id="status-badge" class="fail">FAIL</strong></div>
+            <p class="board-note" id="result-note">Proposed telemetry exceeds the 20% change budget.</p>
+            <table>
+              <caption class="visually-hidden">Estimated baseline and proposed telemetry totals</caption>
+              <thead><tr><th scope="col">Measure</th><th scope="col">Before</th><th scope="col">After</th><th scope="col">Change</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">Ingest / month</th><td id="before-ingest">—</td><td id="after-ingest">—</td><td id="delta-ingest">—</td></tr>
+                <tr><th scope="row">Storage</th><td id="before-storage">—</td><td id="after-storage">—</td><td id="delta-storage">—</td></tr>
+                <tr><th scope="row">Series</th><td id="before-series">—</td><td id="after-series">—</td><td id="delta-series">—</td></tr>
+              </tbody>
+            </table>
+            <div class="privacy-stamp"><span aria-hidden="true">✓</span><div><strong id="redacted-count">3 sensitive fields dropped</strong><small>Aggregated in this tab. Not uploaded or stored.</small></div></div>
+            <p class="heuristic">HEURISTIC ESTIMATE · compare with measured usage</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="preview demo-command" aria-labelledby="cli-demo-title">
+        <div class="section-heading"><div><p class="eyebrow">Native CLI</p><h2 id="cli-demo-title">Run the full bundled sample</h2></div><p>The command creates a temporary sample directory, prints the report, then removes the directory.</p></div>
+        <div class="terminal-recording"><div class="terminal-top"><span aria-hidden="true">● ● ●</span><strong>terminal</strong></div><pre tabindex="0"><code>telemetry-budget-guard demo</code></pre></div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Check OpenTelemetry changes before export.</p>
+      <nav aria-label="Footer navigation"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-telemetry-budget-guard">Source on GitHub (external)</a></nav>
+      <p>Built by Param Factory · v0.1.0 · repair-2</p>
+    </footer>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

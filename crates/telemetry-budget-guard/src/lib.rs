@@ -287,6 +287,17 @@ fn parse_sample(text: &str, allow_sensitive: bool) -> Result<ParsedSample, Guard
     if let Ok(value) = serde_json::from_str::<JsonValue>(text) {
         return parse_json_value(&value, allow_sensitive);
     }
+    if text
+        .lines()
+        .filter(|line| !line.trim().is_empty())
+        .take(MAX_RECORDS + 1)
+        .count()
+        > MAX_RECORDS
+    {
+        return Err(GuardError::Invalid(format!(
+            "sample has more than {MAX_RECORDS} records"
+        )));
+    }
     let mut parsed = ParsedSample::default();
     for (index, line) in text.lines().enumerate() {
         let line = line.trim();
@@ -1042,7 +1053,7 @@ pub fn render_human(report: &Report) -> String {
         display_percent(report.delta.max_attribute_cardinality_percent),
     );
     text.push_str(&format!(
-        "\nPrivacy: {} sensitive fields redacted; sample never persisted.\n",
+        "\nPrivacy: {} sensitive fields redacted; check wrote no sample files.\n",
         report.privacy.sensitive_fields_redacted
     ));
     text.push_str(

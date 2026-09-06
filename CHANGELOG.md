@@ -2,6 +2,13 @@
 
 All notable changes follow [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+- Add the bundled `demo` command and package its realistic checkout-service inputs.
+- Add the `/demo/` browser sandbox with full reset and an explicit sample-data label.
+- Add claim-by-claim verification, complete route metadata, and a designed 404 response.
+- Clarify the first-screen job, audience, first action, privacy facts, and install path.
+
 ## 0.1.0 — 2026-08-27
 
 - Compare bounded OTLP JSON/JSONL samples across baseline and proposed Collector configs.

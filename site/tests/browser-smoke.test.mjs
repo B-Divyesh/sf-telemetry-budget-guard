@@ -38,7 +38,7 @@ for (const [name, viewport] of [
     page.on('request', request => requests.push(request.url()))
 
     try {
-      await page.goto(siteUrl, { waitUntil: 'networkidle' })
+      await page.goto(`${siteUrl}demo/`, { waitUntil: 'networkidle' })
       assert.match(await page.title(), /Telemetry Budget Guard/)
       assert.equal(await page.locator('main').count(), 1)
       assert.equal(await page.locator('h1').count(), 1)

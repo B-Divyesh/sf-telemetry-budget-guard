@@ -1,27 +1,32 @@
 # Telemetry Budget Guard
 
-Catch an expensive OpenTelemetry change before it reaches your backend. `telemetry-budget-guard` compares a bounded, redacted OTLP sample under two OpenTelemetry Collector configs, projects ingest, storage, egress, and metric-series cardinality, and fails CI when the proposed configuration exceeds a declared budget.
+Check an OpenTelemetry Collector change before it raises your observability bill. This CLI is for engineers adding OpenTelemetry to a small service.
 
-Estimates are deliberately vendor-neutral and heuristic. The tool stores nothing, sends nothing, and drops log bodies and prompt-like attributes before aggregation by default.
+It compares one bounded sample under baseline and proposed Collector configs. It estimates ingest, storage, egress, attribute cardinality, and active metric series.
+
+The estimates are heuristic. The CLI fails CI when the proposed result exceeds a declared budget.
 
 ## Install
 
-Build the single binary with stable Rust:
+Install the single binary with stable Rust. No account is needed.
+
+```sh
+cargo install --git https://github.com/B-Divyesh/sf-telemetry-budget-guard
+telemetry-budget-guard demo
+```
+
+The demo runs a bundled checkout-service sample from any working directory. It prints an expected failed budget and removes its temporary files.
+
+You can also build from a local checkout:
 
 ```sh
 cargo install --path crates/telemetry-budget-guard
 telemetry-budget-guard --help
 ```
 
-The release artifact can be prepared without publishing via:
-
-```sh
-cargo package --manifest-path crates/telemetry-budget-guard/Cargo.toml
-```
-
 ## Usage
 
-Capture a bounded OTLP/HTTP JSON response or JSONL sample. A compact JSONL form is also accepted:
+Capture an OTLP/HTTP JSON response, compact JSON array, or JSONL sample. Samples are limited to 100 MiB and 1,000,000 records.
 
 ```json
 {"signal":"metric","name":"http.server.request.duration","attributes":{"http.request.method":"GET","http.route":"/users/{id}"},"timestamp_unix_nano":"1760000000000000000"}
@@ -46,7 +51,7 @@ compression_ratio = 0.35
 replicas = 2
 ```
 
-Compare the configs and gate CI:
+From this repository, compare the shipped sample and configs:
 
 ```sh
 telemetry-budget-guard check \
@@ -56,36 +61,63 @@ telemetry-budget-guard check \
   --budget fixtures/budget.toml
 ```
 
-Use `--json` for stable machine-readable output. Exit `0` means every budget passed, `2` means a budget failed, and `1` means the input/config was invalid. `--allow-sensitive` explicitly opts into retaining body/prompt-like fields in the in-memory estimate; it is off by default.
+Use `--json` for the stable, schema-versioned machine output. Exit `0` means pass, `1` means invalid input, and `2` means budget failure.
 
-Supported Collector effects in v0.1 are ordered `attributes`/`resource` actions (`insert`, `upsert`, `update`, `delete`, `hash`), strict/regexp `filter` include/exclude blocks, and probabilistic sampling. Other processors remain volume-neutral and are listed as warnings, so a config is never silently presented as fully modeled.
+`--allow-sensitive` keeps protected fields in memory for that command only. It never persists the sample.
+
+Version 0.1 models these Collector effects:
+
+- Ordered `attributes` and `resource` actions: `insert`, `upsert`, `update`, `delete`, and `hash`.
+- Strict or regexp `filter` include and exclude blocks.
+- Probabilistic sampling and duplicate pipelines.
+
+Unsupported processors remain volume-neutral and appear as named warnings.
 
 ## Input and output contract
 
-- Input: bounded OTLP/HTTP JSON (`resourceSpans`, `resourceLogs`, `resourceMetrics`) or compact JSON/JSONL records.
-- Privacy: aggregation only; bodies and attribute keys containing `prompt`, `body`, `content`, `message`, or `query` are removed unless explicitly allowed.
+- Input: OTLP/HTTP JSON (`resourceSpans`, `resourceLogs`, `resourceMetrics`), compact JSON arrays, or JSONL records.
+- Privacy: bodies and keys containing `prompt`, `body`, `content`, `message`, or `query` are removed before aggregation by default.
 - Cardinality: exact within the sample, projected as active metric series with a bounded unseen-series estimator.
 - Volume: serialized redacted record bytes, scaled by observed/sample-window rate, replicas, and configured compression.
 - Retention: compressed daily ingest × retention days.
-- Semantic conventions: keys are treated as data rather than hard-coded, so old and new convention names are both measured.
+- Semantic conventions: keys are data, so old and new OpenTelemetry names are both measured.
+
+The `check` command writes no files and makes no network requests. Reports go to standard output.
+
+## Browser sample
+
+Open <https://telemetry-budget-guard.sociobot.in/demo/> for a one-click sample. It shows populated output and keeps edits in the page only.
+
+The sample page works offline after one online visit. The site uses no analytics, cookies, third-party scripts, or third-party fonts.
 
 ## Develop and verify
 
+Prerequisites are stable Rust and Node.js 20 or newer. Start from a clean checkout:
+
 ```sh
-npm install
+npm ci
 npm test
+npm run lint
 npm run build
 npm run build:site       # static site -> dist/site
 npm run package:cli      # ready-to-publish Cargo package
 ```
 
-The documentation/demo site is local-first and makes no network requests. Its browser demo runs entirely in-page and does not upload pasted telemetry.
+Every public promise and its isolated command are listed in [`.factory/claims.json`](.factory/claims.json). Run one with `npm run test:claim -- <claim-id>`.
+
+## Deploy
+
+`npm run build` creates the static site and Linux binary under `dist/site/`. Publish that directory with the factory's existing static deployment.
+
+The repository does not publish packages or change infrastructure. Factory release automation owns those steps.
 
 ## Project layout
 
 - `crates/telemetry-budget-guard` — Rust CLI and estimator library
+- `crates/telemetry-budget-guard/examples/demo` — sample bundled into the installed binary
 - `fixtures` — documented end-to-end example
 - `site` — Vite static landing page and local demo
+- `.factory/claims.json` — public claims and isolated verification commands
 - `.factory/design.md` — product-specific visual decisions and asset provenance
 
 ## License

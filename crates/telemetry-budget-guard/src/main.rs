@@ -1,6 +1,13 @@
 use clap::{Parser, Subcommand};
-use std::path::PathBuf;
+use std::fs;
+use std::path::{Path, PathBuf};
+use std::time::{SystemTime, UNIX_EPOCH};
 use telemetry_budget_guard::{CheckOptions, GuardError, check_paths, render_human};
+
+const DEMO_SAMPLE: &str = include_str!("../examples/demo/otlp-sample.json");
+const DEMO_BASELINE: &str = include_str!("../examples/demo/collector-baseline.yaml");
+const DEMO_PROPOSED: &str = include_str!("../examples/demo/collector-proposed.yaml");
+const DEMO_BUDGET: &str = include_str!("../examples/demo/budget.toml");
 
 #[derive(Debug, Parser)]
 #[command(
@@ -16,6 +23,8 @@ struct Cli {
 
 #[derive(Debug, Subcommand)]
 enum Command {
+    /// Run the bundled checkout-service sample without setup or an account.
+    Demo,
     /// Compare Collector configs and enforce a TOML telemetry budget.
     Check {
         /// Bounded OTLP/HTTP JSON or compact JSONL sample.
@@ -33,7 +42,7 @@ enum Command {
         /// Emit one stable JSON document for CI automation.
         #[arg(long)]
         json: bool,
-        /// Keep body/prompt-like fields in memory for this estimate (unsafe by default).
+        /// Keep body/prompt-like fields in memory for this estimate. Use only with safe data.
         #[arg(long)]
         allow_sensitive: bool,
     },
@@ -42,6 +51,7 @@ enum Command {
 fn main() {
     let cli = Cli::parse();
     let result = match cli.command {
+        Command::Demo => run_demo(),
         Command::Check {
             sample,
             baseline,
@@ -79,4 +89,58 @@ fn main() {
             std::process::exit(1);
         }
     }
+}
+
+fn run_demo() -> Result<i32, GuardError> {
+    let workspace = DemoWorkspace::create()?;
+    let report = check_paths(CheckOptions {
+        sample: workspace.path.join("otlp-sample.json"),
+        baseline: workspace.path.join("collector-baseline.yaml"),
+        proposed: workspace.path.join("collector-proposed.yaml"),
+        budget: workspace.path.join("budget.toml"),
+        allow_sensitive: false,
+    })?;
+    println!("Demo — bundled checkout-service sample; temporary files are removed.\n");
+    println!("{}", render_human(&report));
+    println!(
+        "Temporary sample directory: {} (removed when this run ends).",
+        workspace.path.display()
+    );
+    println!("Demo outcome: budget failure expected; your CI check would exit 2.");
+    Ok(0)
+}
+
+struct DemoWorkspace {
+    path: PathBuf,
+}
+
+impl DemoWorkspace {
+    fn create() -> Result<Self, GuardError> {
+        let nonce = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos();
+        let path = std::env::temp_dir().join(format!(
+            "telemetry-budget-guard-demo-{}-{nonce}",
+            std::process::id()
+        ));
+        fs::create_dir(&path).map_err(|error| GuardError::Io(path.clone(), error))?;
+        let workspace = Self { path };
+        write_demo_file(&workspace.path, "otlp-sample.json", DEMO_SAMPLE)?;
+        write_demo_file(&workspace.path, "collector-baseline.yaml", DEMO_BASELINE)?;
+        write_demo_file(&workspace.path, "collector-proposed.yaml", DEMO_PROPOSED)?;
+        write_demo_file(&workspace.path, "budget.toml", DEMO_BUDGET)?;
+        Ok(workspace)
+    }
+}
+
+impl Drop for DemoWorkspace {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.path);
+    }
+}
+
+fn write_demo_file(root: &Path, name: &str, contents: &str) -> Result<(), GuardError> {
+    let path = root.join(name);
+    fs::write(&path, contents).map_err(|error| GuardError::Io(path, error))
 }

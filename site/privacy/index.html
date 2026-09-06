@@ -4,25 +4,48 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#080b0d" />
-    <meta name="description" content="Telemetry Budget Guard privacy policy." />
+    <meta name="description" content="How Telemetry Budget Guard handles CLI files, browser sample data, storage, and network requests." />
+    <link rel="canonical" href="https://telemetry-budget-guard.sociobot.in/privacy/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Privacy — Telemetry Budget Guard" />
+    <meta property="og:description" content="How the local CLI and browser sample handle telemetry data." />
+    <meta property="og:url" content="https://telemetry-budget-guard.sociobot.in/privacy/" />
+    <meta property="og:image" content="https://telemetry-budget-guard.sociobot.in/og-image.webp" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Privacy — Telemetry Budget Guard" />
+    <meta name="twitter:description" content="How the local CLI and browser sample handle telemetry data." />
+    <meta name="twitter:image" content="https://telemetry-budget-guard.sociobot.in/og-image.webp" />
     <title>Privacy — Telemetry Budget Guard</title>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to main content</a>
-    <header class="site-header"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">TBG</span><span>Telemetry Budget Guard</span></a><nav aria-label="Main navigation"><a href="/">Back home</a></nav></header>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Telemetry Budget Guard home"><span class="brand-mark" aria-hidden="true">TBG</span><span>Telemetry Budget Guard</span></a>
+      <nav aria-label="Main navigation"><a href="/demo/">Demo</a><a href="/#how-it-works">How it works</a><a href="/privacy/" aria-current="page">Privacy</a></nav>
+    </header>
     <main id="main" class="legal-main" tabindex="-1">
-      <p class="eyebrow">Effective August 27, 2026</p>
-      <h1>Privacy, without fine print.</h1>
-      <p>Telemetry Budget Guard is local-first. The CLI reads files you choose, aggregates them in process, and does not transmit or persist their contents. Sensitive body and prompt-like fields are excluded by default.</p>
-      <h2>Website</h2>
-      <p>The browser demo runs entirely in your browser. Pasted data is not uploaded, saved to local storage, or sent to analytics. This static site does not use cookies, tracking pixels, third-party scripts, or third-party fonts.</p>
-      <h2>CLI</h2>
-      <p>The CLI has no telemetry and makes no network requests. `--allow-sensitive` changes only the in-memory estimate for that invocation.</p>
+      <p class="eyebrow">Effective September 6, 2026</p>
+      <h1>Understand how your telemetry is handled</h1>
+      <p>The check command reads only the files you name. It aggregates their contents in the running process.</p>
+      <h2>CLI data</h2>
+      <p>The check command creates no output files and makes no network requests. Reports go to standard output.</p>
+      <p>Body fields and attribute keys containing prompt, body, content, message, or query are removed before aggregation by default.</p>
+      <p>The optional sensitive-field flag keeps those fields in memory for that command only.</p>
+      <h2>Browser sample</h2>
+      <p>The sample calculator runs in your browser. It does not upload input or write it to browser storage.</p>
+      <p>The service worker caches public site files for offline use. It does not cache text entered into the sample form.</p>
+      <h2>Website requests</h2>
+      <p>The site uses no analytics, cookies, tracking pixels, third-party scripts, or third-party fonts.</p>
       <h2>Contact</h2>
-      <p>Questions and security reports can be opened on the <a href="https://github.com/B-Divyesh/sf-telemetry-budget-guard/issues">project issue tracker</a>.</p>
+      <p>Report a privacy or security concern in the <a href="https://github.com/B-Divyesh/sf-telemetry-budget-guard/issues">project issue tracker (external)</a>.</p>
     </main>
-    <footer><p>Free, MIT-licensed, and vendor-neutral.</p><nav aria-label="Legal"><a href="/privacy/" aria-current="page">Privacy</a><a href="/terms/">Terms</a></nav></footer>
+    <footer>
+      <p>Check OpenTelemetry changes before export.</p>
+      <nav aria-label="Footer navigation"><a href="/privacy/" aria-current="page">Privacy</a><a href="/terms/">Terms</a><a href="https://github.com/B-Divyesh/sf-telemetry-budget-guard">Source on GitHub (external)</a></nav>
+      <p>Built by Param Factory · v0.1.0 · repair-2</p>
+    </footer>
     <script type="module" src="/src/legal.ts"></script>
   </body>
 </html>

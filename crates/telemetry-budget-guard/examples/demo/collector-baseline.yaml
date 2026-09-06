@@ -1,0 +1,28 @@
+processors:
+  attributes/budget:
+    actions:
+      - key: customer.id
+        action: delete
+  filter/noise:
+    spans:
+      exclude:
+        match_type: strict
+        span_names: ["GET /health"]
+    logs:
+      exclude:
+        match_type: strict
+        attributes:
+          - key: event.name
+            value: cache.hit
+  probabilistic_sampler/budget:
+    sampling_percentage: 50
+  batch: {}
+
+service:
+  pipelines:
+    traces:
+      processors: [filter/noise, attributes/budget, probabilistic_sampler/budget, batch]
+    logs:
+      processors: [filter/noise, attributes/budget, batch]
+    metrics:
+      processors: [attributes/budget, batch]

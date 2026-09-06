@@ -28,11 +28,14 @@ test('Azure Static Web Apps configuration enforces the release response policy',
     '/assets/*',
     '/night-market-telemetry.webp',
     '/night-market-telemetry-720.webp',
-    '/favicon.svg'
+    '/favicon.svg',
+    '/apple-touch-icon.png',
+    '/og-image.webp'
   ])
   for (const entry of staticWebAppConfig.routes) {
     assert.equal(entry.headers['Cache-Control'], 'public, max-age=31536000, immutable')
   }
+  assert.deepEqual(staticWebAppConfig.responseOverrides, { 404: { rewrite: '/404.html' } })
 })
 
 test('site supports focus, reduced motion, mobile layout, and offline feedback', () => {

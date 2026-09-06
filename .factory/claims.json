@@ -1,0 +1,149 @@
+[
+  {
+    "id": "cli-budget-gate",
+    "claim": "The CLI compares baseline and proposed Collector configs and fails an exceeded budget.",
+    "where": "landing page, README",
+    "test": "npm run test:claim -- cli-budget-gate",
+    "sandbox": "shipped OTLP and Collector fixtures; assert pass with the unchanged config and exit 2 with the proposal"
+  },
+  {
+    "id": "input-formats",
+    "claim": "The CLI accepts OTLP/HTTP JSON, compact JSON arrays, and JSONL.",
+    "where": "landing page, README",
+    "test": "npm run test:claim -- input-formats",
+    "sandbox": "temporary files in all three formats; assert the observed record counts"
+  },
+  {
+    "id": "estimate-measures",
+    "claim": "The CLI estimates ingest, retained storage, egress, attribute cardinality, and active metric series.",
+    "where": "landing page, README",
+    "test": "npm run test:claim -- estimate-measures",
+    "sandbox": "shipped OTLP fixture; assert every named estimate is present and populated for both configs"
+  },
+  {
+    "id": "exit-codes",
+    "claim": "Exit 0 means pass, 1 means invalid input, and 2 means budget failure.",
+    "where": "README",
+    "test": "npm run test:claim -- exit-codes",
+    "sandbox": "temporary invalid input and shipped pass/fail fixtures; assert all three process exit codes"
+  },
+  {
+    "id": "json-contract",
+    "claim": "The --json report has a stable, schema-versioned set of top-level and privacy fields.",
+    "where": "landing page, README",
+    "test": "npm run test:claim -- json-contract",
+    "sandbox": "shipped passing fixture; parse JSON and assert schema version and the complete documented field set"
+  },
+  {
+    "id": "sensitive-default",
+    "claim": "Body and prompt, content, message, or query attributes are removed before aggregation by default.",
+    "where": "landing page, privacy page, README",
+    "test": "npm run test:claim -- sensitive-default",
+    "sandbox": "temporary sample with unique secrets in every protected field; assert redaction count and absence from output"
+  },
+  {
+    "id": "sensitive-opt-in",
+    "claim": "--allow-sensitive includes protected fields in that in-memory estimate without persisting the sample.",
+    "where": "privacy page, README",
+    "test": "npm run test:claim -- sensitive-opt-in",
+    "sandbox": "temporary sensitive sample; compare default and opted-in estimates and assert persisted remains false"
+  },
+  {
+    "id": "no-persistence",
+    "claim": "The check command writes no output files, and the demo removes its temporary sample directory.",
+    "where": "landing page, demo page, privacy page, README",
+    "test": "npm run test:claim -- no-persistence",
+    "sandbox": "fresh temporary working directory with a sentinel file; run demo and assert only the sentinel remains"
+  },
+  {
+    "id": "no-network",
+    "claim": "The native CLI makes no network requests or telemetry calls.",
+    "where": "privacy page, README",
+    "test": "npm run test:claim -- no-network",
+    "sandbox": "run the demo with socket and connect system calls intercepted; assert no attempted call is recorded"
+  },
+  {
+    "id": "modeled-processors",
+    "claim": "The CLI models ordered attribute and resource actions, strict and regexp filters, probabilistic sampling, and duplicate pipelines.",
+    "where": "landing page, README",
+    "test": "npm run test:claim -- modeled-processors",
+    "sandbox": "temporary conformance samples and Collector configs; assert record, cardinality, sampling, and duplication outcomes"
+  },
+  {
+    "id": "unsupported-processors",
+    "claim": "Unsupported processors are reported as warnings and treated as volume-neutral.",
+    "where": "landing page, README",
+    "test": "npm run test:claim -- unsupported-processors",
+    "sandbox": "temporary tail-sampling config; assert unchanged estimates and a named volume-neutral warning"
+  },
+  {
+    "id": "semantic-conventions",
+    "claim": "The estimator measures both old and new OpenTelemetry semantic-convention attribute names.",
+    "where": "README",
+    "test": "npm run test:claim -- semantic-conventions",
+    "sandbox": "paired old/new metric attributes in a temporary sample; assert both contribute to cardinality and series"
+  },
+  {
+    "id": "bounded-samples",
+    "claim": "Samples are limited to 100 MiB and 1,000,000 records.",
+    "where": "README",
+    "test": "npm run test:claim -- bounded-samples",
+    "sandbox": "temporary 100 MiB plus one byte file and 1,000,001-record JSONL file; assert both are rejected"
+  },
+  {
+    "id": "clean-install",
+    "claim": "The packaged crate installs one binary whose bundled demo runs without repository files.",
+    "where": "landing page, README",
+    "test": "npm run test:claim -- clean-install",
+    "sandbox": "cargo package, extract, offline install to a fresh Cargo root, then run the installed demo elsewhere"
+  },
+  {
+    "id": "free-mit-no-account",
+    "claim": "The CLI is free, MIT-licensed, and runs without an account.",
+    "where": "landing page, terms page, README",
+    "test": "npm run test:claim -- free-mit-no-account",
+    "sandbox": "inspect Cargo package metadata and run the bundled demo without credentials or interactive input"
+  },
+  {
+    "id": "cardinality-estimator",
+    "claim": "Attribute cardinality is exact in the sample, and active series uses a bounded unseen-series estimate.",
+    "where": "README",
+    "test": "npm run test:claim -- cardinality-estimator",
+    "sandbox": "deterministic repeated metric sample; assert exact attribute values and the projected series count"
+  },
+  {
+    "id": "otlp-collector-e2e",
+    "claim": "The CLI handles a full OTLP envelope and Collector YAML end to end.",
+    "where": "demo page, README",
+    "test": "npm run test:claim -- otlp-collector-e2e",
+    "sandbox": "shipped full-envelope OTLP sample and both Collector YAML files; assert filtering, redaction, and failure output"
+  },
+  {
+    "id": "browser-local-private",
+    "claim": "The browser sample checks pasted telemetry without uploads or browser storage.",
+    "where": "demo page, privacy page, README",
+    "test": "npm run test:claim -- browser-local-private",
+    "sandbox": "fresh browser context; enter a unique sensitive sample and assert populated output, same-origin requests, and empty storage"
+  },
+  {
+    "id": "site-no-tracking",
+    "claim": "The site uses no analytics, cookies, tracking pixels, third-party scripts, or third-party fonts.",
+    "where": "privacy page, README",
+    "test": "npm run test:claim -- site-no-tracking",
+    "sandbox": "fresh browser context across every route; assert only same-origin requests, no cookies, empty storage, and no runtime errors"
+  },
+  {
+    "id": "offline-reload",
+    "claim": "The populated sample page works offline after one online visit.",
+    "where": "landing offline notice, demo page, README",
+    "test": "npm run test:claim -- offline-reload",
+    "sandbox": "isolated service-worker browser context; load online, set the context offline, reload, and assert the populated result"
+  },
+  {
+    "id": "demo-sandbox",
+    "claim": "One click opens realistic sample output with a persistent demo label, complete reset, and no changes to existing browser data.",
+    "where": "landing page, demo page, README",
+    "test": "npm run test:claim -- demo-sandbox",
+    "sandbox": "fresh phone browser with a sentinel real-data key; enter from the first screen, edit all fields, reset, and assert the sentinel is unchanged"
+  }
+]

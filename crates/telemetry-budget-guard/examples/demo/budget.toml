@@ -1,0 +1,13 @@
+[limits]
+sample_window_seconds = 60
+monthly_ingest_gib = 1
+retained_storage_gib = 1
+monthly_egress_gib = 1
+active_metric_series = 10
+max_attribute_cardinality = 100
+max_delta_percent = 20
+
+[assumptions]
+retention_days = 30
+compression_ratio = 0.35
+replicas = 2
