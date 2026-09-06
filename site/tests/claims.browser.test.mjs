@@ -243,6 +243,13 @@ test('all routes have metadata, shared structure, accessible controls, and a sty
       const description = await page.locator('meta[name="description"]').getAttribute('content')
       assert.ok(description && description.length <= 155, `${route} description is ${description?.length} characters`)
       assert.deepEqual(await page.locator('header nav a').allTextContents(), ['Demo', 'How it works', 'Privacy'])
+      const undersizedTargets = await page.locator('a:visible, button:visible, input:visible, textarea:visible').evaluateAll((elements) => elements
+        .map((element) => {
+          const bounds = element.getBoundingClientRect()
+          return { name: element.textContent?.trim() || element.getAttribute('aria-label') || element.id, width: bounds.width, height: bounds.height }
+        })
+        .filter(({ width, height }) => width < 44 || height < 44))
+      assert.deepEqual(undersizedTargets, [], `${route} has undersized targets`)
       const axe = await new AxeBuilder({ page }).analyze()
       assert.equal(axe.violations.filter(({ impact }) => ['serious', 'critical'].includes(impact)).length, 0, JSON.stringify(axe.violations))
     }
