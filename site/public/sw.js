@@ -1,8 +1,21 @@
-const CACHE = 'telemetry-budget-guard-v3'
+const CACHE = 'telemetry-budget-guard-v4'
 const SHELL = ['/', '/demo/', '/privacy/', '/terms/', '/404.html', '/favicon.svg', '/apple-touch-icon.png', '/og-image.webp', '/night-market-telemetry.webp', '/night-market-telemetry-720.webp']
+const HTML_ROUTES = ['/', '/demo/', '/privacy/', '/terms/', '/404.html']
+
+async function cacheShell() {
+  const cache = await caches.open(CACHE)
+  await cache.addAll(SHELL)
+  const assetUrls = new Set()
+  for (const route of HTML_ROUTES) {
+    const response = await cache.match(route)
+    const html = response ? await response.text() : ''
+    for (const match of html.matchAll(/(?:src|href)="(\/assets\/[^\"]+)"/g)) assetUrls.add(match[1])
+  }
+  await cache.addAll([...assetUrls])
+}
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)))
+  event.waitUntil(cacheShell())
   self.skipWaiting()
 })
 

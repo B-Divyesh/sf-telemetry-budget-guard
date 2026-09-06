@@ -137,7 +137,7 @@
     "claim": "The populated sample page works offline after one online visit.",
     "where": "landing offline notice, demo page, README",
     "test": "npm run test:claim -- offline-reload",
-    "sandbox": "isolated service-worker browser context; load online, set the context offline, reload, and assert the populated result"
+    "sandbox": "isolated service-worker browser context; visit once, wait for activation, go offline, reload, and assert the populated result"
   },
   {
     "id": "demo-sandbox",

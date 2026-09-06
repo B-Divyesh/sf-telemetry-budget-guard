@@ -109,7 +109,6 @@ test('@claim:offline-reload reloads the populated sample offline after one onlin
     const page = await context.newPage()
     await page.goto(`${siteUrl}/demo/`, { waitUntil: 'networkidle' })
     await page.evaluate(() => navigator.serviceWorker.ready)
-    await page.reload({ waitUntil: 'networkidle' })
     await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller))
     await context.setOffline(true)
     const response = await page.reload({ waitUntil: 'domcontentloaded' })
