@@ -1,10 +1,14 @@
 # Review 1 — prevent an OpenTelemetry change from breaking its budget
 
-**Work order:** `telemetry-budget-guard-review-1`  
-**Review date:** 2026-09-06 UTC  
-**Live URL:** <https://telemetry-budget-guard.sociobot.in>  
-**Implementation reviewed:** `4d184aabcff4e5e93c6ee1014581bf0733281dec`  
-**Documentation head:** `0698a1fe414fe2214a206a83eb2654a769580971`  
+**Work order:** `telemetry-budget-guard-review-1`
+
+**Review date:** 2026-09-06 UTC
+
+**Live URL:** <https://telemetry-budget-guard.sociobot.in>
+
+**Implementation reviewed:** `4d184aabcff4e5e93c6ee1014581bf0733281dec`
+
+**Documentation head:** `0698a1fe414fe2214a206a83eb2654a769580971`
 
 ## Verdict
 
