@@ -1,105 +1,93 @@
-# Telemetry Budget Guard — review handoff
+# Telemetry Budget Guard — repair 2 handoff
 
-## Review 1 verdict — FAIL (2026-09-06 UTC)
+## Outcome
 
-Independent review of live implementation `4d184aabcff4e5e93c6ee1014581bf0733281dec` at documentation head `0698a1fe414fe2214a206a83eb2654a769580971` found **6 defects and 21 untested public claims**. See [review-1.md](review-1.md) for the complete evidence and required disposition.
+Strict review findings F1–F6 are fixed and verified. The current live product at <https://telemetry-budget-guard.sociobot.in/> is the static build from candidate `3d32a878c236b09c249f49dc311424a0fffd03a8`.
 
-The core CLI, clean Git install, pass/fail/invalid/boundary/recovery paths, live privacy behavior, offline reload, response policies, reduced motion, axe scan, and performance budgets pass. Acceptance fails because `.factory/claims.json` and all `@claim` tests are absent; the required real-binary sample demo, `/demo`, persistent sample label, complete reset, and demo documentation are absent; first-screen copy does not plainly name the job and audience; required metadata and a designed 404 are missing; the installed package cannot run the documented fixture without the repository; and one legal link is below the 44 px touch-target baseline. The live release-archive claim is also contradicted by the 404 download path.
+- Product implementation SHA: `54cc8b9` (`fix: cache first-visit modules for offline reload`).
+- Verification-tooling SHA: `3d32a87` (`test: isolate browser builds from release artifacts`). This changes only the browser test build directory.
+- Final deployment: Azure Static Web Apps deployment `a88095c7-aba5-4cff-9c1d-4a16db5a8002`, completed successfully on 2026-09-06 UTC.
+- The handoff update after that candidate is documentation-only and does not require a new product image.
 
-No product code was changed in review 1. Reproduce the passing gates with:
+## What changed
+
+- Added `.factory/claims.json` with 21 public claims. Each claim has one unique `@claim:<id>` outcome test and one runnable command.
+- Added `telemetry-budget-guard demo`. It runs a bundled checkout-service OTLP sample with real Collector YAML and budget inputs in a temporary directory.
+- Included the demo inputs and integration tests in the Cargo package. A clean consumer can install the crate and run the demo without repository files.
+- Added `/demo/` with populated output, a persistent sample-data banner, full reset, and a **Start for real** path.
+- Kept demo edits in page memory. Existing browser storage is not read, overwritten, or copied into demo state.
+- Rewrote the first screen to name the job, audience, and first action in plain words. All three product facts fit before scrolling at 1440×1000 and 390×844.
+- Added literal section headings and `.factory/copy-audit.md`. No landing sentence exceeds 22 words or uses a banned marketing term.
+- Added per-route canonical, Open Graph, Twitter, touch-icon, title, and description metadata.
+- Added a product-styled 404 response, shared navigation/footer structure, `/demo/` and `/404.html` sitemap entries, and correct Static Web Apps 404 handling.
+- Raised all tested interactive targets to at least 44×44 CSS pixels, including the mobile wordmark and terms link.
+- Fixed the browser estimate when both baseline and proposed samples contain zero metric series.
+- Made first-visit offline reload exact: the service worker discovers built assets, precaches them, handles `Vary` safely, and removes old caches.
+- Removed the unsupported release-archive promise. The normal build still stages the Linux binary in `dist/site/download/`.
+- Added the share image and touch icon. Their derivation and provenance are recorded in `.factory/design.md`.
+- Updated README setup, demo, supported inputs, exact bounds, privacy behavior, claim commands, build, package, and deployment instructions.
+
+## Review finding disposition
+
+| Finding | Disposition and evidence |
+| --- | --- |
+| F1 — 21 untested claims | Fixed. All 21 claims are registered and passed their individual commands from a clean checkout. Registry coverage rejects duplicate, missing, or extra tags. |
+| F2 — missing CLI sample sandbox | Fixed. The installed binary runs `demo`; `/demo/` opens in one click, shows a realistic failure, keeps the label visible, resets all fields, and leaves a seeded real-data key unchanged. |
+| F3 — unclear first screen | Fixed. H1 is “Check OpenTelemetry changes against your budget.” The next sentence names engineers adding OpenTelemetry to a small service. The sample action and result note are adjacent. |
+| F4 — routes, metadata, and structure | Fixed. Root, demo, privacy, terms, and designed 404 routes have distinct titles, canonical/share metadata, shared header/footer, one H1, and a main landmark. |
+| F5 — installed sample unavailable | Fixed. Cargo packages four bundled sample inputs. A fresh offline package install runs `telemetry-budget-guard demo`. `CHANGELOG.md` is present. |
+| F6 — undersized legal link | Fixed. Every visible link, button, input, and textarea on all routes measured at least 44×44 CSS pixels at 320 px width. |
+
+Earlier verification items remain fixed: HTTPS is valid, security headers and immutable hashed-asset caching are live, and skip links focus `main` on every route. The previous generic 404 is replaced by a designed page that retains HTTP 404 for unknown routes.
+
+## Clean verification
+
+Fresh clone: `/tmp/tbg-clean-verify.iep3ZZ` at `3d32a878c236b09c249f49dc311424a0fffd03a8`.
 
 ```sh
 npm ci
 npm test
 npm run lint
 npm run build
+test -x dist/site/download/telemetry-budget-guard-linux-x86_64
 npm run package:cli
 ```
 
-Repair all findings, add every public claim to the claims registry with one sandboxed tagged test, deploy the new candidate, and run a fresh strict review. A successful build does not change the current product verdict.
+Results:
 
----
+- `npm ci`: passed; 22 packages installed and 0 vulnerabilities reported.
+- `npm test`: passed; 4 Rust unit tests, 2 Rust CLI integration tests, and 33 site/browser tests.
+- `npm run lint`: passed; TypeScript, rustfmt, and Clippy with warnings denied.
+- `npm run build`: passed; `dist/site/` contains every route and the Linux x86_64 binary.
+- Initial site payload: 5.82 KB JavaScript uncompressed, 2.61 KB JavaScript gzip, 13.23 KB CSS uncompressed, 3.91 KB CSS gzip, no webfonts, and a 42.64 KB phone image.
+- `npm run package:cli`: passed; 12 files, 69.3 KiB unpacked and 18.4 KiB compressed.
+- Clean consumer claim: passed; the packaged crate installed one binary offline into a new Cargo root and its bundled demo ran outside the repository.
+- All 21 commands in `.factory/claims.json`: passed individually from the clean checkout.
+- Normal, expected budget failure, malformed input, zero-window boundary, sample size/count limits, sensitive opt-in, unsupported processor, and recovery paths passed.
 
-## Independent release verdict — PASS (2026-08-28 UTC)
+## Live verification
 
-Candidate `4d184aabcff4e5e93c6ee1014581bf0733281dec` passes independent verification at <https://telemetry-budget-guard.sociobot.in/>. See [verification-3.md](verification-3.md) for complete fresh evidence and severity assessment; no Critical, High, Medium, or Low acceptance defects were found.
+- All 18 served files checked, including HTML routes, hashed JS/CSS, images, service worker, metadata files, and the staged binary, byte-match the clean build.
+- Factory `verify-url.sh`: passed with HTTPS 200, correct title and language, one H1, a main landmark, alt text, labelled buttons, and no console errors.
+- Fresh desktop 1440×1000 and phone 390×844 contexts: job, audience, action, and three facts appear before scrolling.
+- The live one-click demo starts at a populated `FAIL`, changes to `PASS`, resets every field, preserves unrelated storage, and keeps its demo banner visible.
+- Keyboard skip focus, invalid-input focus, recovery, reduced motion, 200% text sizing, and 320 px layout/touch targets passed.
+- Playwright axe across all five routes: 0 serious or critical findings. The complete route scans reported no violations.
+- Privacy: all page requests were same-origin; there were no cookies, third-party scripts/fonts, analytics, uploads, or console errors.
+- Offline: a fresh phone context loaded `/demo/` once, then reloaded it offline with HTTP 200 and populated output.
+- Unknown path: deliberate HTTP 404 with the designed recovery page. All internal and external links checked returned 200.
+- Response headers: self-only CSP, denied camera/microphone/geolocation permissions, `Referrer-Policy: no-referrer`, and `X-Content-Type-Options: nosniff`. Hashed assets use one-year immutable caching.
+- Lighthouse 13.4.1 mobile report: Performance 100, Accessibility 100, Best Practices 100, SEO 100; FCP 0.824 s, LCP 0.824 s, TBT 0 ms, CLS 0.
 
-The verifier made no product-code changes. From a clean candidate checkout, `npm ci`, `npm test`, `npm run lint`, `npm run build`, and `npm run package:cli` passed; the packed crate installed and worked in a clean consumer. Live headers, candidate identity hashes, desktop and 390px mobile flows, keyboard skip focus, reduced-motion, PWA offline reload/update behavior, privacy/no-outbound-request checks, and axe serious/critical checks passed. Live Lighthouse: Performance 100, Accessibility 100, Best Practices 100, SEO 100; LCP 1.2 s, CLS 0, TBT 20 ms. Lighthouse emitted a post-report Chromium teardown warning, but the complete report and independent Playwright runs passed.
+Lighthouse wrote the complete report with no run warnings, then its Chromium tab crashed during teardown. Independent Playwright checks and the factory verifier completed without page or console errors. Evidence is under `/work/.evidence/repair-2-live/`.
 
-Reproduce:
+The catalog description is 98 characters, verb-first, and copied to `/work/.evidence/catalog-description.txt`. The researched product is free, so no billing offer or registration is applicable.
 
-```sh
-npm ci
-npm test
-npm run lint
-npm run build
-npm run package:cli
-```
+## Known limits
 
----
+- OTTL expressions, tail-sampling policies, and arbitrary vendor processors are not modeled in v0.1. Active unsupported processors are named and treated as volume-neutral.
+- Estimates depend on a representative sample and configured assumptions. Teams should compare estimates with measured usage across releases.
+- The browser page is a compact preview. The native CLI is authoritative for full OTLP envelopes and Collector YAML.
+- The staged binary targets Linux x86_64. Multi-platform signed archives and checksums remain release-automation work and are not advertised.
 
-## Release repair (2026-08-28 UTC)
-
-This repair addresses both release blockers in [`.factory/verification-2.md`](verification-2.md) while preserving the CLI, privacy model, static deployment class, and all previously passing behavior.
-
-- Added `site/public/staticwebapp.config.json`, the Azure Static Web Apps-native response-policy configuration. It applies the required self-only CSP, `Permissions-Policy: camera=(), microphone=(), geolocation=()`, `Referrer-Policy: no-referrer`, and `X-Content-Type-Options: nosniff`; it applies `Cache-Control: public, max-age=31536000, immutable` to `/assets/*`, both WebP images, and the favicon. The compatible `_headers` file remains in place.
-- Added `tabindex="-1"` to the landing, privacy, and terms main landmarks. Native skip-link fragment navigation now transfers focus to `main`.
-- Added exact response-policy contract coverage, a Chromium skip-link regression test, desktop and 390px Chromium/axe smoke tests, and strict TypeScript checking. The factory deployed the checked-in Azure-native configuration to the existing static product host.
-
-## What shipped
-
-- Rust 0.1.0 single-binary CLI with helpful `--help`, human output, stable `--json`, and CI exit codes (`0` pass, `1` invalid input, `2` budget failure).
-- Bounded OTLP/HTTP JSON, compact JSON array, and JSONL ingestion (100 MiB / 1,000,000-record safety caps).
-- Baseline/proposed OpenTelemetry Collector pipeline comparison. v0.1 models ordered attributes/resource actions, strict or regexp include/exclude filters, probabilistic sampling, and multiple output pipelines. Unsupported active processors produce explicit warnings and remain volume-neutral.
-- Heuristic monthly compressed ingest, retained storage, egress, record rate, exact sampled attribute cardinality, and bounded Chao1 metric-series estimation.
-- Privacy defaults: log bodies and attribute keys containing `prompt`, `body`, `content`, `message`, or `query` are removed before aggregation. The CLI has no network calls, persistence, or telemetry.
-- A documented failing fixture in `fixtures/` and six Rust tests, including the README command, privacy behavior, OTLP envelopes, config transforms, JSON output, and exit codes.
-- Vite landing/docs site with an entirely local JSONL estimate demo, offline notice and cached shell, empty/invalid/loading/pass/fail feedback, `/privacy/`, `/terms/`, responsive 390px layout, and keyboard-visible focus.
-- Original night-market telemetry illustration generated with the factory image deployment and responsive WebP derivatives (123 KB desktop / 43 KB mobile). Provenance and the complete visual system are in `.factory/design.md`.
-
-## Run and verify
-
-```sh
-npm install
-npm test
-npm run build            # static deployment at dist/site + Linux binary download
-npm run package:cli      # verified Cargo package, not published
-
-target/release/telemetry-budget-guard check \
-  --sample fixtures/otlp-sample.json \
-  --baseline fixtures/collector-baseline.yaml \
-  --proposed fixtures/collector-proposed.yaml \
-  --budget fixtures/budget.toml --json
-```
-
-The example deliberately exceeds `max_delta_percent` and exits 2.
-
-Final local verification on 2026-08-28:
-
-- Clean `npm ci`: passed; `npm audit` reported 0 vulnerabilities.
-- `npm test`: passed — 4 Rust unit tests, 2 Rust CLI integration tests, strict TypeScript checking, 4 static-site policy/privacy/semantic tests, a Chromium skip-link regression test, and desktop plus 390px Chromium/axe smoke tests.
-- `npm run lint`: passed — strict TypeScript, Rust formatting, and Clippy with warnings denied.
-- Browser smoke: default estimator state loaded; a 10,000% limit recovered to `PASS`; Enter from the skip link focused `main`; axe reported 0 serious/critical findings; there were 0 console errors, 0 page errors, and all page requests were self-origin.
-- `npm run build`: passed; `dist/site/index.html`, `dist/site/staticwebapp.config.json`, and the release binary staged under `dist/site/download/` exist. The generated Azure configuration byte-matches its checked-in source.
-- `cargo package --manifest-path crates/telemetry-budget-guard/Cargo.toml --locked`: packaged and verified successfully (16 KB crate archive).
-- `cargo fmt --check` and `cargo clippy --workspace --all-targets --locked -- -D warnings`: passed.
-- Clean consumer: installed the packaged crate to a fresh temporary Cargo root and ran its binary against shipped fixtures; it returned a valid passing JSON report with `heuristic: true` and `sample_persisted: false`.
-- Production preview and live PWA: after registration and controlled reload, `navigator.serviceWorker.controller` was true; an offline reload returned 200 and retained the title.
-- Initial payload: 4.46 KB JS, 10.91 KB CSS, 43 KB mobile hero; no third-party runtime requests or fonts.
-
-## Live deployment evidence
-
-The factory static deployment completed successfully on 2026-08-28 (Azure deployment `5483d8a3-45de-4fc2-9e4e-cfa23419fe65`) and the managed TLS endpoint returned HTTPS 200.
-
-- `curl -I https://telemetry-budget-guard.sociobot.in/` returned the self-only CSP, `Permissions-Policy: camera=(), microphone=(), geolocation=()`, `Referrer-Policy: no-referrer`, and `X-Content-Type-Options: nosniff`.
-- `curl -I https://telemetry-budget-guard.sociobot.in/assets/main-BpOzwUEz.js` returned those same security headers plus `Cache-Control: public, max-age=31536000, immutable`.
-- SHA-256 identity checks matched the production build for the root, privacy and terms pages; both JavaScript assets; both CSS assets; both WebP assets; the service worker; and favicon.
-- Live Playwright desktop and 390px mobile checks passed: skip-link Enter focused `main`, axe had 0 serious/critical findings, cookies/local/session storage were empty, console/page errors were empty, and all initial requests were same-origin.
-- Live Lighthouse 12.8.2 mobile report: Performance 100, Accessibility 100, Best Practices 100, SEO 100; FCP 1.1 s, LCP 1.1 s, CLS 0, TBT 0 ms. Lighthouse emitted its known final tab-crash warning after writing the complete JSON report.
-
-## Known gaps and next steps
-
-- OTTL transform/filter expressions, tail-sampling policies, and arbitrary vendor processors are intentionally not interpreted in v0.1. The CLI warns for each active unsupported processor; add evaluators only with conformance fixtures.
-- Projection quality depends on a representative bounded window. Teams should compare estimates with actual usage for three releases and tune the window, replica, compression, and retention assumptions.
-- The browser demo illustrates the calculation shape for compact JSONL; authoritative gates use the native CLI with full Collector YAML.
-- The staged download is for this Linux x86_64 worker. Factory release automation should build signed archives for supported targets and insert checksums.
+No backend, tenant state, database, payment, or external model integration exists. Backend isolation, restart persistence, health, 429/Retry-After, billing registration, and AI gateway checks are therefore not applicable.
